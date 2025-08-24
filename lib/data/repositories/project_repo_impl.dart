@@ -18,9 +18,9 @@ class ProjectRepositoryImpl implements ProjectRepository {
   Future<Result<Project>> create(String name) async {
     try {
       final localModel = await local.create(name);
-      // Simulate background sync (fire and forget in production, await here)
+
       final remoteCreated = await remote.createProject(localModel.name);
-      // Ensure local has remote (ids differ), but for mock keep local id authoritative.
+
       return Success(localModel.toEntity());
     } on Exception catch (e) {
       return Failure(e);

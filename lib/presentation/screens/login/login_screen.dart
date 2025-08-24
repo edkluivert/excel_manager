@@ -1,3 +1,5 @@
+import 'package:excel_manager/core/di/injector.dart';
+import 'package:excel_manager/services/shared_pref/shared_pref_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,6 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  final SharedPrefsService _sharedPrefsService = sl<SharedPrefsService>();
+
   bool _loading = false;
 
   Future<void> _login() async {
@@ -23,8 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _loading = false);
 
       // Navigate to Dashboard after login
+      await _sharedPrefsService.saveAuthToken('mock_token_123'); // Save mock token
       if(mounted) {
         await Navigator.pushReplacementNamed(context, '/dashboard');
+
       }
     }
   }

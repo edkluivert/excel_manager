@@ -12,7 +12,7 @@ class OpenAiService implements AiService {
   Future<List<GeneratedTask>> suggestTasks(String prompt) async {
     final key = Env.openAiKey;
     if (key == null || key.isEmpty) throw Exception('Missing OPENAI_API_KEY');
-    // Call your preferred OpenAI endpoint (e.g., responses API). Pseudocode:
+
     final res = await _client.post(
       Uri.parse('https://api.openai.com/v1/responses'),
       headers: {'Authorization': 'Bearer $key', 'Content-Type': 'application/json'},

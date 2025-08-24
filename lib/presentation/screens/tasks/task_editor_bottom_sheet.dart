@@ -87,10 +87,10 @@ class _TaskEditorBottomSheetState extends State<TaskEditorBottomSheet> {
               children: [
                 Text(
                   _formatDueDate(currentDueAt),
-                  style: TextStyle(
-                    color: isOverdue ? Colors.red : Colors.black87,
+                  style: isOverdue ? TextStyle(
+                    color:  Colors.red ,
                     fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
-                  ),
+                  ) :  Theme.of(context).textTheme.bodyLarge!,
                 ),
                 const Spacer(),
                 IconButton(
@@ -113,7 +113,7 @@ class _TaskEditorBottomSheetState extends State<TaskEditorBottomSheet> {
             const SizedBox(height: 12),
 
             DropdownButtonFormField<String>(
-              value: currentPriority,
+              initialValue: currentPriority,
               items: priorities
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                   .toList(),

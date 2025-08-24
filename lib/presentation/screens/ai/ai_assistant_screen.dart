@@ -1,7 +1,6 @@
 import 'package:excel_manager/application/ai/ai_assistant_cubit.dart';
 import 'package:excel_manager/application/task/task_cubit.dart';
 import 'package:excel_manager/domain/entities/task.dart';
-import 'package:excel_manager/services/ai/mock_ai_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -57,12 +56,15 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             Expanded(
               child: BlocBuilder<AiAssistantCubit, AiAssistantState>(
                 builder: (context, state) {
-                  if (state.loading)
+                  if (state.loading) {
                     return const Center(child: CircularProgressIndicator());
-                  if (state.error != null)
+                  }
+                  if (state.error != null) {
                     return Center(child: Text('Error: ${state.error}'));
-                  if (state.tasks.isEmpty)
+                  }
+                  if (state.tasks.isEmpty) {
                     return const Center(child: Text('No suggestions yet'));
+                  }
                   return ListView.separated(
                     itemCount: state.tasks.length,
                     separatorBuilder: (_, _) => const Divider(),
@@ -80,7 +82,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                           onPressed: () async {
                             widget.taskCubit.addTask(
                               TaskAdapter.fromGenerated(t,
-                                  widget.projectId),
+                                  widget.projectId,
+                              ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Imported')));

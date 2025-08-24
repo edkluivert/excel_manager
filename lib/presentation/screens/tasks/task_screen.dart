@@ -8,12 +8,13 @@ import 'package:excel_manager/presentation/screens/tasks/task_editor_bottom_shee
 import 'package:excel_manager/services/ai/mock_ai_service.dart';
 import 'package:excel_manager/services/notification/notification_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TaskScreen extends StatefulWidget {
-  final String projectName;
 
-  const TaskScreen({Key? key, required this.projectName}) : super(key: key);
+  const TaskScreen({required this.projectName, super.key,});
+  final String projectName;
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
@@ -50,7 +51,7 @@ class _TaskScreenState extends State<TaskScreen> {
     );
 
     if (result != null) {
-      // Attach projectId before saving
+
       final finalTask = result.copyWith(projectId: widget.projectName);
 
       if (task == null) {
@@ -122,14 +123,26 @@ class _TaskScreenState extends State<TaskScreen> {
               itemCount: state.tasks.length,
               itemBuilder: (context, index) {
                 final task = state.tasks[index];
-                return ListTile(
-                  title: Text(task.title),
-                  subtitle: Text('Priority: ${task.priority.name}'),
-                  trailing: Checkbox(
-                    value: task.completed,
-                    onChanged: (val) {
-                     taskCubit.toggleComplete(task);
-                    },
+                return Animate(
+                  effects: [
+                    FadeEffect(duration: 300.ms),
+                    SlideEffect(
+                      begin: const Offset(0, 0.3),
+                      end: Offset.zero,
+                      duration: 300.ms,
+                      delay: (index * 100).ms,
+                    ),
+                  ],
+                  child: ListTile(
+                    title: Text(task.title),
+                    subtitle: Text('Priority: ${task.priority.name}'),
+                    trailing: Checkbox(
+                      value: task.completed,
+                      onChanged: (val) {
+                       taskCubit.toggleComplete(task);
+                      },
+                    ),
+                    onTap: () => _openTaskEditor(task),
                   ),
                 );
               },
