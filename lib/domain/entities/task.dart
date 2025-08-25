@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:excel_manager/services/ai/ai_service.dart';
+import 'package:excel_manager/data/ai/ai_service.dart';
 import 'package:uuid/uuid.dart';
 
 enum Priority { low, medium, high }

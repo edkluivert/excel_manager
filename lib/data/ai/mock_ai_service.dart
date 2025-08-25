@@ -1,6 +1,7 @@
 import 'dart:math';
+import 'package:excel_manager/data/ai/ai_service.dart';
 import 'package:excel_manager/domain/entities/task.dart';
-import 'package:excel_manager/services/ai/ai_service.dart';
+
 
 class MockAiService implements AiService {
   final _rnd = Random();
@@ -9,7 +10,7 @@ class MockAiService implements AiService {
   Future<List<GeneratedTask>> suggestTasks(String prompt) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     final now = DateTime.now();
-    // naive parse: look for numbers + keywords
+
     final tasks = <GeneratedTask>[
       GeneratedTask(title: 'Write weekly plan', note: 'From prompt: $prompt', dueAt: now.add(const Duration(days: 1))),
       GeneratedTask(title: 'Deep work block', note: '2h focus', priority: Priority.high),

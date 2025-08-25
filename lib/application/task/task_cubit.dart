@@ -60,4 +60,10 @@ class TaskCubit extends Cubit<TaskState> {
     await load();
   }
 
+  Future<void> deleteTask(String id) async {
+    await repo.delete(id);
+    await service.cancel(id);
+    await load();
+  }
+
 }

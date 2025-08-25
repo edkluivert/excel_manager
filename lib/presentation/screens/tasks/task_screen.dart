@@ -1,15 +1,18 @@
 import 'package:excel_manager/application/ai/ai_assistant_cubit.dart';
 import 'package:excel_manager/application/task/task_cubit.dart';
 import 'package:excel_manager/core/di/injector.dart';
+import 'package:excel_manager/data/ai/gemini_ai_service.dart';
+import 'package:excel_manager/data/ai/mock_ai_service.dart';
+import 'package:excel_manager/data/ai/open_ai_service.dart';
 import 'package:excel_manager/domain/entities/task.dart';
 import 'package:excel_manager/domain/repositories/task_repo.dart';
 import 'package:excel_manager/presentation/screens/ai/ai_assistant_screen.dart';
 import 'package:excel_manager/presentation/screens/tasks/task_editor_bottom_sheet.dart';
-import 'package:excel_manager/services/ai/mock_ai_service.dart';
 import 'package:excel_manager/services/notification/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class TaskScreen extends StatefulWidget {
 
@@ -29,11 +32,11 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
-    aiAssistantCubit = AiAssistantCubit(MockAiService());
+    aiAssistantCubit = AiAssistantCubit(sl<MockAiService>(),
+        sl<OpenAiService>(), sl<GeminiAiService>());
     taskCubit = TaskCubit(sl<TaskRepository>(), sl<NotificationService>(),
         widget.projectName);
 
-    // Load initial tasks (mocked for this example)
     taskCubit.load();
   }
 
@@ -70,7 +73,7 @@ class _TaskScreenState extends State<TaskScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(
-          value: AiAssistantCubit(MockAiService()),
+          value: aiAssistantCubit,
         ),
         BlocProvider.value(
           value: taskCubit,
@@ -86,21 +89,27 @@ class _TaskScreenState extends State<TaskScreen> {
                   taskCubit.load();
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.generating_tokens),
-                onPressed: () {
+              const SizedBox(width: 8),
+              InkResponse(
+                onTap: (){
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) =>
                           AiAssistantScreen(
                               projectId: widget.projectName,
-                               aiAssistantCubit: aiAssistantCubit,
-                                taskCubit: taskCubit
+                              aiAssistantCubit: aiAssistantCubit,
+                              taskCubit: taskCubit
                           ),
                     ),
                   );
                 },
+                child: SvgPicture.asset(
+                  'assets/icons/ai.svg',
+                  width: 24,
+                  height: 24,
+                ),
               ),
+              const SizedBox(width: 16),
             ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -133,16 +142,33 @@ class _TaskScreenState extends State<TaskScreen> {
                       delay: (index * 100).ms,
                     ),
                   ],
-                  child: ListTile(
-                    title: Text(task.title),
-                    subtitle: Text('Priority: ${task.priority.name}'),
-                    trailing: Checkbox(
-                      value: task.completed,
-                      onChanged: (val) {
-                       taskCubit.toggleComplete(task);
-                      },
+                  child: Dismissible(
+                    key: ValueKey(task),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    onTap: () => _openTaskEditor(task),
+                    onDismissed: (_) {
+                      taskCubit.deleteTask(task.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$task deleted')),
+                      );
+                    },
+                    child: ListTile(
+                      title: Text(task.title),
+                      subtitle: Text('Priority: ${task.priority.name}'),
+                      trailing: Checkbox(
+                        value: task.completed,
+                        onChanged: (val) {
+                         taskCubit.toggleComplete(task);
+                        },
+                      ),
+                      onTap: () => _openTaskEditor(task),
+                      
+                    ),
                   ),
                 );
               },

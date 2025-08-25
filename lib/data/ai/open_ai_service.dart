@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:excel_manager/core/env/env.dart';
+import 'package:excel_manager/core/errors/failure.dart';
+import 'package:excel_manager/data/ai/ai_service.dart';
 import 'package:excel_manager/domain/entities/task.dart';
-import 'package:excel_manager/services/ai/ai_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class OpenAiService implements AiService {
@@ -14,14 +16,17 @@ class OpenAiService implements AiService {
     if (key == null || key.isEmpty) throw Exception('Missing OPENAI_API_KEY');
 
     final res = await _client.post(
-      Uri.parse('https://api.openai.com/v1/responses'),
+      Uri.parse('https://api.openai.com/v1/completions'),
       headers: {'Authorization': 'Bearer $key', 'Content-Type': 'application/json'},
       body: jsonEncode({
-        'model': 'gpt-4.1-mini',
-        'input': 'Return a JSON array of tasks with fields: title,note,priority(low|medium|high),dueAt(ISO). Prompt: $prompt'
+        'model': 'gpt-3.5-turbo-instruct',
+        'prompt': 'Return a JSON array of tasks with fields: title,note,priority(low|medium|high),dueAt(ISO). Prompt: $prompt'
       }),
     );
-    if (res.statusCode >= 400) throw Exception('OpenAI error: ${res.body}');
+    if (res.statusCode >= 400) {
+      debugPrint(res.body);
+      throw Exception(Failure(res.body).message);
+    }
     final text = jsonDecode(res.body)['output_text'] as String;
     final parsed = jsonDecode(text) as List<dynamic>;
     return parsed.map((e) => GeneratedTask(

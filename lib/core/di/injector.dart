@@ -1,6 +1,10 @@
 import 'package:excel_manager/application/theme/theme_cubit.dart';
 import 'package:excel_manager/core/env/env.dart';
 import 'package:excel_manager/core/routes/navigation_service.dart';
+import 'package:excel_manager/data/ai/ai_service.dart';
+import 'package:excel_manager/data/ai/gemini_ai_service.dart';
+import 'package:excel_manager/data/ai/mock_ai_service.dart';
+import 'package:excel_manager/data/ai/open_ai_service.dart';
 import 'package:excel_manager/data/data_sources/local/hive_db.dart';
 import 'package:excel_manager/data/data_sources/local/project_local_ds.dart';
 import 'package:excel_manager/data/data_sources/local/task_ds.dart';
@@ -10,9 +14,6 @@ import 'package:excel_manager/data/repositories/task_repo_impl.dart';
 import 'package:excel_manager/domain/repositories/project_repo.dart';
 import 'package:excel_manager/domain/repositories/task_repo.dart';
 import 'package:excel_manager/presentation/bloc/auth/auth_bloc.dart';
-import 'package:excel_manager/services/ai/ai_service.dart';
-import 'package:excel_manager/services/ai/mock_ai_service.dart';
-import 'package:excel_manager/services/ai/open_ai_service.dart';
 import 'package:excel_manager/services/notification/notification_service.dart';
 import 'package:excel_manager/services/shared_pref/shared_pref_service.dart';
 import 'package:get_it/get_it.dart';
@@ -39,11 +40,15 @@ Future<void> initInjector() async {
   ..registerLazySingleton<NotificationService>(NotificationService.new)
   ..registerSingleton<SharedPrefsService>(prefs)
   // AI
+  ..registerLazySingleton<OpenAiService>(() => OpenAiService(http.Client()))
+  ..registerLazySingleton<GeminiAiService>(()=> GeminiAiService(http.Client()))
+  ..registerLazySingleton<MockAiService>(MockAiService.new)
+
   ..registerLazySingleton<AiService>(() {
     switch (Env.aiProvider) {
-      case AiProvider.openai: return OpenAiService(http.Client());
-      case AiProvider.gemini: return MockAiService();
-      case AiProvider.mock: _: return MockAiService();
+      case AiProvider.openai: return sl<OpenAiService>();
+      case AiProvider.gemini: return sl<GeminiAiService>();
+      case AiProvider.mock:   return sl<MockAiService>();
     }
   })
   // Cubits / Blocs
