@@ -13,7 +13,7 @@ import 'package:excel_manager/data/repositories/project_repo_impl.dart';
 import 'package:excel_manager/data/repositories/task_repo_impl.dart';
 import 'package:excel_manager/domain/repositories/project_repo.dart';
 import 'package:excel_manager/domain/repositories/task_repo.dart';
-import 'package:excel_manager/presentation/bloc/auth/auth_bloc.dart';
+import 'package:excel_manager/application/auth/auth_bloc.dart';
 import 'package:excel_manager/services/notification/notification_service.dart';
 import 'package:excel_manager/services/shared_pref/shared_pref_service.dart';
 import 'package:get_it/get_it.dart';

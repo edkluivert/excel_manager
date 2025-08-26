@@ -1,5 +1,5 @@
-import 'package:excel_manager/presentation/bloc/auth/auth_event.dart';
-import 'package:excel_manager/presentation/bloc/auth/auth_state.dart';
+import 'package:excel_manager/application/auth/auth_event.dart';
+import 'package:excel_manager/application/auth/auth_state.dart';
 import 'package:excel_manager/services/shared_pref/shared_pref_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

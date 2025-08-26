@@ -54,11 +54,20 @@ class GeminiAiService implements AiService {
     late final List<dynamic> parsed;
     try {
       parsed = jsonDecode(raw.toString()) as List<dynamic>;
-    } on Exception catch (e) {
+    } on Exception {
       throw Exception('Failed to parse Gemini JSON: $raw');
     }
 
     return parsed.map((e) {
+      final parsedDue = e['dueAt'] != null
+          ? DateTime.tryParse(e['dueAt'] as String)
+          : null;
+
+      // If Gemini gives no date or a past date, fallback to tomorrow
+      final adjustedDue = (parsedDue == null || parsedDue.isBefore(DateTime.now()))
+          ? DateTime.now().add(const Duration(days: 1))
+          : parsedDue;
+
       return GeneratedTask(
         title: e['title'] as String,
         note: e['note'] as String?,
@@ -67,12 +76,11 @@ class GeminiAiService implements AiService {
           'high' => Priority.high,
           _ => Priority.medium,
         },
-        dueAt: e['dueAt'] != null
-            ? DateTime.tryParse(e['dueAt'] as String)
-            : null,
+        dueAt: adjustedDue,
       );
     }).toList();
   }
+
 
 
   @override
