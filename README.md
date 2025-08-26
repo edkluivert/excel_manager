@@ -81,3 +81,6 @@ Tests are located in the test/ directory.
 
 Integration Tests
 flutter test integration_test
+
+
+Also there's an app release apk in the project for android devices.
